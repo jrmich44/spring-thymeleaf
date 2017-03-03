@@ -97,7 +97,7 @@
 							<name>1213-domain</name>
 							<run>
 								<ports>
-									<port>host.port:7001</port>
+									<port>7001:7001</port>
 								</ports>
 								<hostname>wlsadmin</hostname>
 								<wait>
@@ -110,12 +110,12 @@
 											com.mysql.jdbc.Driver michaelj password123 Server AdminServer
 										</postStart>
 									</exec> -->
-									<exec>
+ 									<exec>
 										<postStart>/u01/oracle/createServer.sh</postStart>
 									</exec>
 								</wait>
-								<env>
-									<XML>&lt;?xml version=&quot;1.0&quot;?&gt;&lt;resources&gt;&lt;adminServer&gt;&lt;url&gt;t3://wsladmin:7001&lt;/url&gt;&lt;username&gt;weblogic&lt;/username&gt;&lt;password&gt;weblogic123&lt;/password&gt;&lt;/adminServer&gt;&lt;datasources&gt;&lt;datasource&gt;&lt;name&gt;awsDS&lt;/name&gt;&lt;jndi&gt;jdbc/awsDS&lt;/jndi&gt;&lt;url&gt;jdbc:mysql://awsdb2.cv8fnjbjinxg.us-east-1.rds.amazonaws.com:3306/testDB&lt;/url&gt;&lt;driver&gt;com.mysql.jdbc.Driver&lt;/driver&gt;&lt;username&gt;michaelj&lt;/username&gt;&lt;password&gt;password123&lt;/password&gt;&lt;targetType&gt;Server&lt;/targetType&gt;&lt;target&gt;AdminServer&lt;/target&gt;&lt;/datasource&gt;&lt;/datasources&gt;&lt;/resources&gt;</XML>
+ 								<env>
+									<XML>&lt;?xml version=&quot;1.0&quot;?&gt;&lt;resources&gt;&lt;adminServer&gt;&lt;url&gt;t3://wlsadmin:7001&lt;/url&gt;&lt;username&gt;weblogic&lt;/username&gt;&lt;password&gt;weblogic123&lt;/password&gt;&lt;/adminServer&gt;&lt;datasources&gt;&lt;datasource&gt;&lt;name&gt;awsDS&lt;/name&gt;&lt;jndi&gt;jdbc/awsDS&lt;/jndi&gt;&lt;url&gt;jdbc:mysql://awsdb2.cv8fnjbjinxg.us-east-1.rds.amazonaws.com:3306/testDB&lt;/url&gt;&lt;driver&gt;com.mysql.jdbc.Driver&lt;/driver&gt;&lt;username&gt;michaelj&lt;/username&gt;&lt;password&gt;password123&lt;/password&gt;&lt;targetType&gt;Server&lt;/targetType&gt;&lt;target&gt;AdminServer&lt;/target&gt;&lt;/datasource&gt;&lt;/datasources&gt;&lt;/resources&gt;</XML>
 								</env>
 							</run>
 						</image>
@@ -138,27 +138,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-
-			
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<echo>Displaying value of 'testproperty' property</echo>
-								<echo>[testproperty] ${json}</echo>
-							</tasks>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin> -->
 			
 			
 

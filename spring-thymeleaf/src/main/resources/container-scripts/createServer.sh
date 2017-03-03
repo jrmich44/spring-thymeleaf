@@ -18,7 +18,10 @@ echo "Starting NodeManager in background..."
 nohup startNodeManager.sh > log.nm 2>&1 &
 echo "NodeManager started."
 echo $XML
-adminURL=$(python -c 'import xmlUtil; print xmlUtil.getAdminURL()')
+export PYTHONPATH=$PYTHONPATH:/u01/oracle
+echo $PYTHONPATH
+python -c 'import sys; sys.path.append("/u01/oracle"); print sys.path'
+adminURL=$(python -c 'import sys; import xmlUtil; print xmlUtil.getAdminURL()')
 echo $adminURL
 
 #managedServers=$(python -c 'import xmlUtil; print xmlUtil.getManagedServers()')

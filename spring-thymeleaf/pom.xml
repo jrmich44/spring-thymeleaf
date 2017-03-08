@@ -22,7 +22,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-		<json>{Host Port is ${host.port}}</json>
+		<selenium-java.version>3.1.0</selenium-java.version>
+		<webdrivermanager.version>1.6.0</webdrivermanager.version>
+		<guava.version>21.0</guava.version>
 	</properties>
 
 	<dependencies>
@@ -45,6 +47,19 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-dbcp2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
@@ -55,34 +70,34 @@
 			<type>pom</type>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.github.bonigarcia</groupId>
+			<artifactId>webdrivermanager</artifactId>
+			<version>1.6.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>3.0.1</version><!--$NO-MVN-MAN-VER$ -->
+			<scope>test</scope>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-
-
-			<!-- <plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0.0</version>
-				<executions>
-					<execution>
-						<phase>pre-integration-test</phase>
-						<goals>
-							<goal>read-project-properties</goal>
-						</goals>
-						<configuration>
-							<files>
-								<file>src/main/resources/docker.properties</file>
-							</files>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin> -->
 
 
 			<plugin>
@@ -93,29 +108,51 @@
 					<showLogs>true</showLogs>
 					<images>
 						<image>
+							<alias>mysql-test</alias>
+							<name>mysql</name>
+							<run>
+								<ports>
+									<port>database.port:3306</port>
+								</ports>
+								<wait>
+									<log>ready for connections.</log>
+									<time>30000</time>
+								</wait>
+								<env>
+									<MYSQL_ROOT_PASSWORD>password</MYSQL_ROOT_PASSWORD>
+								</env>
+								<volumes>
+									<from>
+										<image>data-mysql</image>
+									</from>
+								</volumes>
+							</run>
+						</image>
+						<image>
 							<alias>wlsadmin</alias>
 							<name>1213-domain</name>
 							<run>
 								<ports>
-									<port>7001:7001</port>
+									<port>weblogic.port:7001</port>
 								</ports>
+								<links>
+									<link>mysql-test</link>
+								</links>
 								<hostname>wlsadmin</hostname>
 								<wait>
 									<log>Server state changed to RUNNING.</log>
 									<time>30000</time>
-									<!-- <exec>
-										<postStart>/u01/oracle/createServer.sh weblogic weblogic123
-											t3://wlsadmin:${host.port} awsDS jdbc/awsDS
-											jdbc:mysql://awsdb2.cv8fnjbjinxg.us-east-1.rds.amazonaws.com:${host.port}/testDB
-											com.mysql.jdbc.Driver michaelj password123 Server AdminServer
-										</postStart>
-									</exec> -->
- 									<exec>
+									<!-- <exec> <postStart>/u01/oracle/createServer.sh weblogic weblogic123 
+										t3://wlsadmin:${host.port} awsDS jdbc/awsDS jdbc:mysql://awsdb2.cv8fnjbjinxg.us-east-1.rds.amazonaws.com:${host.port}/testDB 
+										com.mysql.jdbc.Driver michaelj password123 Server AdminServer </postStart> 
+										</exec> -->
+									<exec>
 										<postStart>/u01/oracle/createServer.sh</postStart>
 									</exec>
 								</wait>
- 								<env>
-									<XML>&lt;?xml version=&quot;1.0&quot;?&gt;&lt;resources&gt;&lt;adminServer&gt;&lt;url&gt;t3://wlsadmin:7001&lt;/url&gt;&lt;username&gt;weblogic&lt;/username&gt;&lt;password&gt;weblogic123&lt;/password&gt;&lt;/adminServer&gt;&lt;datasources&gt;&lt;datasource&gt;&lt;name&gt;awsDS&lt;/name&gt;&lt;jndi&gt;jdbc/awsDS&lt;/jndi&gt;&lt;url&gt;jdbc:mysql://awsdb2.cv8fnjbjinxg.us-east-1.rds.amazonaws.com:3306/testDB&lt;/url&gt;&lt;driver&gt;com.mysql.jdbc.Driver&lt;/driver&gt;&lt;username&gt;michaelj&lt;/username&gt;&lt;password&gt;password123&lt;/password&gt;&lt;targetType&gt;Server&lt;/targetType&gt;&lt;target&gt;AdminServer&lt;/target&gt;&lt;/datasource&gt;&lt;/datasources&gt;&lt;/resources&gt;</XML>
+								<env>
+									<XML>&lt;?xml
+										version=&quot;1.0&quot;?&gt;&lt;resources&gt;&lt;adminServer&gt;&lt;url&gt;t3://wlsadmin:7001&lt;/url&gt;&lt;username&gt;weblogic&lt;/username&gt;&lt;password&gt;weblogic123&lt;/password&gt;&lt;/adminServer&gt;&lt;datasources&gt;&lt;datasource&gt;&lt;name&gt;dockerDS&lt;/name&gt;&lt;jndi&gt;jdbc/dockerDS&lt;/jndi&gt;&lt;url&gt;jdbc:mysql://mysql-test:3306/employees&lt;/url&gt;&lt;driver&gt;com.mysql.jdbc.Driver&lt;/driver&gt;&lt;username&gt;newuser&lt;/username&gt;&lt;password&gt;password&lt;/password&gt;&lt;targetType&gt;Server&lt;/targetType&gt;&lt;target&gt;AdminServer&lt;/target&gt;&lt;/datasource&gt;&lt;/datasources&gt;&lt;/resources&gt;</XML>
 								</env>
 							</run>
 						</image>
@@ -138,8 +175,8 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			
+
+
 
 			<plugin>
 				<!-- This is the configuration for the weblogic-maven-plugin -->
@@ -172,7 +209,7 @@
 						<configuration>
 							<!--The admin URL where the app is deployed. Here use the plugin's 
 								default value t3://localhost:7001 -->
-							<adminurl>t3://localhost:7001</adminurl>
+							<adminurl>t3://localhost:${weblogic.port}</adminurl>
 							<user>weblogic</user>
 							<password>weblogic123</password>
 							<!--The location of the file or directory to be deployed -->
@@ -193,6 +230,18 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<systemProperties>
+						<property>
+							<name>weblogicPort</name>
+							<value>${weblogic.port}</value>
+						</property>
+						<property>
+							<name>databasePort</name>
+							<value>${database.port}</value>
+						</property>
+					</systemProperties>
+				</configuration>
 				<executions>
 					<execution>
 						<id>integration-test</id>
